@@ -36,6 +36,8 @@
 		A2A8093623AE54EF004793EB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A2A8093823AE54EF004793EB /* Localizable.strings */; };
 		A2A8093C23AE558A004793EB /* String+localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A8093B23AE558A004793EB /* String+localized.swift */; };
 		A2A8093E23AE5AFF004793EB /* onMainThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A8093D23AE5AFF004793EB /* onMainThread.swift */; };
+		A2BFEB7F23B0E8E90077E4A9 /* LocationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2BFEB7E23B0E8E90077E4A9 /* LocationError.swift */; };
+		A2BFEB8123B0E9680077E4A9 /* Describable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2BFEB8023B0E9680077E4A9 /* Describable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -88,6 +90,8 @@
 		A2A8093923AE5518004793EB /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2A8093B23AE558A004793EB /* String+localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+localized.swift"; sourceTree = "<group>"; };
 		A2A8093D23AE5AFF004793EB /* onMainThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = onMainThread.swift; sourceTree = "<group>"; };
+		A2BFEB7E23B0E8E90077E4A9 /* LocationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationError.swift; sourceTree = "<group>"; };
+		A2BFEB8023B0E9680077E4A9 /* Describable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Describable.swift; sourceTree = "<group>"; };
 		A2E7CD0B23B0ACEC00AC252D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -175,6 +179,8 @@
 				A2A8092823ACEEF4004793EB /* Network.swift */,
 				A2A8092F23AD5B87004793EB /* NetworkError.swift */,
 				A2A8093123AD5BAE004793EB /* OWMApi.swift */,
+				A2BFEB7E23B0E8E90077E4A9 /* LocationError.swift */,
+				A2BFEB8023B0E9680077E4A9 /* Describable.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -347,9 +353,11 @@
 				A2A808E123AA7B38004793EB /* RecordViewController.swift in Sources */,
 				A2A8092323ACDDDB004793EB /* WeatherData+CoreDataProperties.swift in Sources */,
 				A2A8091E23ACDDDB004793EB /* WeatherCondition+CoreDataClass.swift in Sources */,
+				A2BFEB8123B0E9680077E4A9 /* Describable.swift in Sources */,
 				A2A8091D23ACDDDB004793EB /* Record+CoreDataProperties.swift in Sources */,
 				A2A8092723ACE4C1004793EB /* RecordCellView.swift in Sources */,
 				A2A8093023AD5B87004793EB /* NetworkError.swift in Sources */,
+				A2BFEB7F23B0E8E90077E4A9 /* LocationError.swift in Sources */,
 				A2A8091C23ACDDDB004793EB /* Record+CoreDataClass.swift in Sources */,
 				A2A808E323AA7BB7004793EB /* HistoryViewController.swift in Sources */,
 				A263F1BE23AFC8AC0074DE40 /* WeatherColors.swift in Sources */,

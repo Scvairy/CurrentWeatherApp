@@ -83,6 +83,7 @@ extension HistoryViewController: UITableViewDelegate {
         let record = fetchedRC.object(at: indexPath)
         let vc = RecordViewController()
         vc.record = record
+        vc.updateViews()
         vc.isRefreshable = false
         let formatter = DateFormatter()
         formatter.dateStyle = .medium

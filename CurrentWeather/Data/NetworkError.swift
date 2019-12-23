@@ -8,14 +8,15 @@
 
 import Foundation
 
-enum NetworkError: Error {
+enum NetworkError: Error, Describable {
     case badUrlError
     case badRequestError
     case badStatusCodeError(statusCode: Int)
     case noDataError
     case parseError
+    case noApi
 
-    func getText() -> String {
+    public func getText() -> String {
         let errorText: String
         switch self {
         case .badUrlError:
@@ -28,6 +29,8 @@ enum NetworkError: Error {
             errorText = "No data returned"
         case .parseError:
             errorText = "Parse error"
+        case .noApi:
+            errorText = "No Api"
         }
         return errorText
     }

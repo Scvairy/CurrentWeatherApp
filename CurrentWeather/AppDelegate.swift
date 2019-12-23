@@ -35,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             initialLaunch = false
             return
         }
-        (window!.rootViewController as! RootTabBarController).requestLocation()
+        (window!.rootViewController as! RootTabBarController).reloadData()
     }
 
     func saveContext() {

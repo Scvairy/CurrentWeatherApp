@@ -16,8 +16,11 @@ class OWMApi {
     let units = "metric"
     let lang: String
 
-    init(apiKey: String, lang: String? = nil) {
+    init?(apiKey: String, lang: String? = nil) {
         self.apiKey = apiKey
+        if apiKey.isEmpty {
+            return nil
+        }
         self.lang = lang ?? NSLocale.preferredLanguages.first!
     }
 

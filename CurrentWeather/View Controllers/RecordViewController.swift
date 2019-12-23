@@ -11,18 +11,14 @@ class RecordViewController: UIViewController {
 
     //MARK:- Internal variables
     weak var root: RootTabBarController?
-    var record: Record? {
-        didSet {
-            updateViews()
-        }
-    }
+    var record: Record?
     var isRefreshable: Bool?
     var textColor: UIColor = .darkText {
         didSet {
             cityLabel.textColor = textColor
             conditionLabel.textColor = textColor
             tempLabel.textColor = textColor
-            refreshButton.tintColor = textColor
+            wrapperView.refreshControl?.tintColor = textColor
             imageView.tintColor = textColor
         }
     }
@@ -36,8 +32,39 @@ class RecordViewController: UIViewController {
         }
     }
 
+    private func configureRefreshControl () {
+       // Add the refresh control to your UIScrollView object.
+       wrapperView.refreshControl = UIRefreshControl()
+       wrapperView.refreshControl?.addTarget(self, action:
+                                          #selector(handleRefreshControl),
+                                          for: .valueChanged)
+    }
+
+    @objc private func handleRefreshControl() {
+       // Update your content…
+        root?.reloadData()
+
+       // Dismiss the refresh control.
+//        onMainThread {
+//          self.wrapperView.refreshControl?.endRefreshing()
+//       }
+    }
+
+//    private var isIndicatorShown: Bool = true {
+//        didSet {
+//            isIndicatorShown ? indicatorView.startAnimating() : indicatorView.stopAnimating()
+//            indicatorView.isHidden = !isIndicatorShown
+//        }
+//    }
+
     //MARK:- Private view variables
     private var spinnerView: UIView?
+//    private var indicatorView: UIActivityIndicatorView = {
+//        let indicator = UIActivityIndicatorView(style: .whiteLarge)
+//        indicator.startAnimating()
+//        indicator.translatesAutoresizingMaskIntoConstraints = false
+//        return indicator
+//    }()
     private var wrapperView: UIScrollView = {
         let view = UIScrollView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -82,18 +109,22 @@ class RecordViewController: UIViewController {
         return label
     }()
 
-    private var refreshButton: UIButton = {
-        let view = UIButton()
-        view.titleLabel?.text = "Refresh ↻".localized()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
+    //MARK:- Internal Functions
+    init(isRefreshable: Bool = false) {
+        super.init(nibName: nil, bundle: nil)
+        self.isRefreshable = isRefreshable
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
 
     //MARK:- Internal Functions
     func updateData(with json: JSON) {
         NSLog("Update by JSON from \(#function)")
         record = Record.addRecord(from: json, insertInto: context)
         guard record != nil else { return }
+        updateViews(fromCache: false)
         appDelegate.saveContext()
     }
 
@@ -103,10 +134,11 @@ class RecordViewController: UIViewController {
         setup()
         layoutViews()
     }
-
+    var isInitialAppearing: Bool = true
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateViews()
+        updateViews(fromCache: isInitialAppearing)
+        isInitialAppearing = false
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -120,7 +152,7 @@ class RecordViewController: UIViewController {
         } else {
             view.backgroundColor = .white
         }
-        
+
         if record == nil {
             let request: NSFetchRequest<Record> = Record.fetchRequest()
             request.sortDescriptors = [NSSortDescriptor(keyPath: \Record.date, ascending: false)]
@@ -128,6 +160,7 @@ class RecordViewController: UIViewController {
             do {
                 record = try context.fetch(request).first
                 print("Last record fetched")
+                updateViews(fromCache: true)
             } catch let error as NSError {
                 print("Error on fetch last record. \(error), \(error.userInfo)")
             }
@@ -151,15 +184,11 @@ class RecordViewController: UIViewController {
         let separator2 = UIView()
         separator2.autoresizingMask = [.flexibleHeight]
         if let isRefreshable = isRefreshable, isRefreshable {
-            stackView.addArrangedSubview(refreshButton)
-            refreshButton.addTarget(self, action: #selector(didTapRefresh(_:)), for: .touchUpInside)
+            configureRefreshControl()
         }
         _ = [separator1, cityLabel, conditionLabel, imageWrapper, tempLabel, separator2].compactMap {
             stackView.addArrangedSubview($0)
         }
-    }
-    @objc private func didTapRefresh(_ sender: UIButton) {
-        root?.requestLocation()
     }
 
     private func layoutViews() {
@@ -200,14 +229,14 @@ class RecordViewController: UIViewController {
         ])
     }
 
-    private func updateViews() {
+    func updateViews(fromCache: Bool = true) {
         onMainThread {
             NSLog("\(#function)")
-            if record == nil, spinnerView == nil {
-                showSpinner(on: view)
-            } else if record != nil {
-                removeSpinner()
-            }
+//            if record == nil, spinnerView == nil {
+//                wrapperView.refreshControl?.beginRefreshing()
+//            } else if record != nil {
+//                wrapperView.refreshControl?.endRefreshing()
+//            }
             cityLabel.text = record?.city?.name ?? "City".localized()
             conditionLabel.text = record?.condition?.desc ?? "weather condition".localized()
             tempLabel.text = record != nil ? "\(record!.data!.temp) C°" : ""
@@ -221,28 +250,11 @@ class RecordViewController: UIViewController {
             imageView.image = UIImage(named: record?.condition?.icon ?? "umbrella.splash")?.withRenderingMode(.alwaysTemplate)
             textColor = tintColor
             view.backgroundColor = WeatherColors.background(for: dayTime)
-        }
-    }
-
-    private func showSpinner(on view: UIView) {
-        let wrapper = UIView(frame: view.bounds)
-        wrapper.backgroundColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 0.5)
-        let indicator = UIActivityIndicatorView(style: .whiteLarge)
-        indicator.startAnimating()
-        indicator.center = wrapper.center
-
-        onMainThread {
-            wrapper.addSubview(indicator)
-            view.addSubview(wrapper)
-        }
-
-        spinnerView = wrapper
-    }
-
-    private func removeSpinner() {
-        onMainThread {
-            spinnerView?.removeFromSuperview()
-            spinnerView = nil
+            if fromCache {
+                wrapperView.refreshControl?.beginRefreshing()
+            } else {
+                wrapperView.refreshControl?.endRefreshing()
+            }
         }
     }
 }

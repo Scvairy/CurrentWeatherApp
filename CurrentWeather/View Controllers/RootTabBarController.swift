@@ -10,11 +10,11 @@ import SwiftyJSON
 class RootTabBarController: UITabBarController {
 
     //MARK:- Private variables and constants
-    private let todayVC = RecordViewController()
+    private let todayVC = RecordViewController(isRefreshable: true)
     private let historyNavVC = UINavigationController()
     private let historyVC = HistoryViewController()
 
-    private var api: OWMApi = OWMApi(apiKey: Bundle.main.infoDictionary?["OWMApiKey"] as! String)
+    private var api = OWMApi(apiKey: Bundle.main.infoDictionary?["OWMApiKey"] as! String)
     private lazy var locationManager: CLLocationManager = {
         let manager = CLLocationManager()
 
@@ -25,26 +25,33 @@ class RootTabBarController: UITabBarController {
 
         return manager
     }()
+    private let significantDistance: CLLocationDistance = 10_000
     private var location: CLLocation! {
         didSet {
-            reloadData()
+            guard oldValue != nil,
+                oldValue.distance(from: location) < significantDistance else {//meters
+                return
+            }
+            reloadDataWithLocation()
         }
     }
 
     //MARK:- Internal Functions
-    func requestLocation() {
+    func reloadData() {
         locationManager.requestLocation()
     }
-    func reloadData() {
+    func reloadDataWithLocation() {
         NSLog("\(#function)")
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let sself = self else { return }
-            sself.api.getCurrentWeather(for: sself.location) { (json, error) in
+            sself.api?.getCurrentWeather(for: sself.location) { (json, error) in
                 guard let json = json else {
                     self?.showError(error, animated: true)
                     return
                 }
                 self?.todayVC.updateData(with: json)
+                } ?? onMainThread {
+                    self?.showError(NetworkError.noApi, animated: true)
             }
         }
     }
@@ -53,14 +60,13 @@ class RootTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingLocation()
+        reloadData()
         setup()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         print("TabBar WillAppear")
-        requestLocation()
     }
 
     //MARK:- Private Functions
@@ -68,7 +74,6 @@ class RootTabBarController: UITabBarController {
         setViewControllers([todayVC, historyNavVC], animated: false)
 
         todayVC.root = self
-        todayVC.isRefreshable = true
         todayVC.title = "Today".localized()
         if #available(iOS 13.0, *) {
             todayVC.tabBarItem.image = UIImage(systemName: "umbrella")
@@ -84,7 +89,7 @@ class RootTabBarController: UITabBarController {
         historyVC.title = "History".localized()
     }
 
-    private func showError(_ error: NetworkError?, animated: Bool) {
+    private func showError(_ error: Describable?, animated: Bool) {
         guard let error = error else { return }
         let message = error.getText()
 
@@ -94,7 +99,14 @@ class RootTabBarController: UITabBarController {
                 title: "Try Again".localized(),
                 style: .default,
                 handler: {[weak self] _ in
-                    self?.requestLocation()
+                    switch error {
+                    case _ as LocationError:
+                        self?.reloadData()
+                    case _ as NetworkError:
+                        self?.reloadDataWithLocation()
+                    default:
+                        break
+                    }
 
                 }
             )
@@ -129,5 +141,6 @@ extension RootTabBarController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         let error = error as NSError
         NSLog("LocationManager failed with \(error), \(error.userInfo)")
+        showError(LocationError.noLocationError, animated: true)
     }
 }
