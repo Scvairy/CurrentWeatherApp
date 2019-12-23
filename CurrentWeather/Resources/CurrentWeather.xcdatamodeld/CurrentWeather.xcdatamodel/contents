@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="18G2022" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="City" representedClassName="City" syncable="YES">
+        <attribute name="id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="lat" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="lon" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <relationship name="records" toMany="YES" deletionRule="Nullify" destinationEntity="Record" inverseName="city" inverseEntity="Record"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="Record" representedClassName="Record" syncable="YES">
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sunrise" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sunset" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="units" attributeType="Decimal" defaultValueString="0.0"/>
+        <relationship name="city" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="City" inverseName="records" inverseEntity="City"/>
+        <relationship name="condition" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WeatherCondition" inverseName="records" inverseEntity="WeatherCondition"/>
+        <relationship name="data" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WeatherData" inverseName="record" inverseEntity="WeatherData"/>
+        <relationship name="wind" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WindData" inverseName="record" inverseEntity="WindData"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="date"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="WeatherCondition" representedClassName="WeatherCondition" syncable="YES">
+        <attribute name="desc" attributeType="String"/>
+        <attribute name="icon" attributeType="String"/>
+        <attribute name="id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="main" attributeType="String"/>
+        <relationship name="records" toMany="YES" deletionRule="Nullify" destinationEntity="Record" inverseName="condition" inverseEntity="Record"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="WeatherData" representedClassName="WeatherData" syncable="YES">
+        <attribute name="humidity" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="pressure" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="temp" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="record" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Record" inverseName="data" inverseEntity="Record"/>
+    </entity>
+    <entity name="WindData" representedClassName="WindData" syncable="YES">
+        <attribute name="deg" attributeType="Integer 16" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="speed" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="record" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Record" inverseName="wind" inverseEntity="Record"/>
+    </entity>
+    <elements>
+        <element name="City" positionX="1.66015625" positionY="-62.8359375" width="128" height="118"/>
+        <element name="Record" positionX="-201.1953125" positionY="66.171875" width="128" height="163"/>
+        <element name="WeatherCondition" positionX="4.48046875" positionY="182.3125" width="128" height="118"/>
+        <element name="WeatherData" positionX="33.125" positionY="70.25" width="128" height="103"/>
+        <element name="WindData" positionX="-221.375" positionY="235.65625" width="128" height="28"/>
+    </elements>
+</model>
