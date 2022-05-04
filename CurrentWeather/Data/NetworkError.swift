@@ -30,7 +30,7 @@ enum NetworkError: Error, Describable {
         case .parseError:
             errorText = "Parse error"
         case .noApi:
-            errorText = "No Api"
+            errorText = "No Api key"
         }
         return errorText
     }
